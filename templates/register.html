@@ -29,14 +29,6 @@
             </p>
         {% endfor %}
     <p>
-        {{ form.time.label }}<br>
-        {% for subfield in form.time %}
-        <tr>
-            <td>{{ subfield }}</td>
-            <td>{{ subfield.label }}</td>
-        </tr>
-        {% endfor %}
-        <br><br>
         {{ form.type.label }}<br>
     {% for subfield in form.type %}
         <tr>

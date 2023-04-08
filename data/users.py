@@ -14,7 +14,6 @@ class User(SqlAlchemyBase, UserMixin):
     email =     sqlalchemy.Column(sqlalchemy.String,
                               index=True, unique=True)
     hashed_password = sqlalchemy.Column(sqlalchemy.String)
-    date = sqlalchemy.Column(sqlalchemy.String)
     type = sqlalchemy.Column(sqlalchemy.String)
     current_quote = sqlalchemy.Column(sqlalchemy.Integer)
 

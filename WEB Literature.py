@@ -24,9 +24,9 @@ db_session.global_init("db/quotes.db")
 db_sess = db_session.create_session()
 
 
-def get_quote():
+def get_quote(current):
     db_sess = db_session.create_session()
-    user = db_sess.query(User).filter(User.id == current_user.id).first()
+    user = db_sess.query(User).filter(User.id == current.id).first()
     if user:
         if user.type == 'rus':
             quote = db_sess.query(Russian).filter(Russian.id == User.current_quote).first()
@@ -40,22 +40,25 @@ def get_quote():
 
 def choice_quote():
     db_sess = db_session.create_session()
-    user = db_sess.query(User).filter(User.id == current_user.id).first()
-    if user:
-        user.current_quote = randint(1, 100)
-        db_sess.commit()
+    users = db_sess.query(User).all()
+    if users:
+        for user in users:
+            user.current_quote = randint(1, 100)
+            db_sess.commit()
 
 
 def check():
     try:
-        db_sess = db_session.create_session()
-        now = strftime("%H:%M")
-        user = db_sess.query(User).filter(User.id == current_user.id).first()
-        if user:
-            if now == f"{user.date}:00":
-                choice_quote()
+        now = strftime("%H:%M:%S")
+        if now == '10:00:00':
+            choice_quote()
     except AttributeError:
         pass
+
+
+def main():
+    RepeatTimer(1, check).start()
+    app.run(port=8000, host='127.0.0.1')
 
 
 @app.errorhandler(404)
@@ -67,20 +70,13 @@ def load_user(user_id):
     db_sess = db_session.create_session()
     return db_sess.query(User).get(user_id)
 
-
-def main():
-    RepeatTimer(10, check).start()
-    app.run(port=8000, host='127.0.0.1')
-
-
 @app.route('/')
 def index():
     try:
-        quote = get_quote()
+        quote = get_quote(current_user)
         return render_template('index.html', title='Homepage', quote=quote)
     except AttributeError:
         return redirect('/login')
-
 
 @app.route('/register', methods=['GET', 'POST'])
 def reqister():
@@ -98,14 +94,14 @@ def reqister():
 
         user = User(
             email=form.email.data,
-            date=form.time.data,
             type=form.type.data,
             current_quote=randint(1, 100)
         )
         user.set_password(form.password.data)
         db_sess.add(user)
         db_sess.commit()
-        return redirect('/login')
+        login_user(user, remember=False)
+        return redirect("/")
     return render_template('register.html', title='Registration', form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -115,13 +111,12 @@ def login():
         db_sess = db_session.create_session()
         user = db_sess.query(User).filter(User.email == form.email.data).first()
         if user and user.check_password(form.password.data):
-            login_user(user, remember=form.remember_me.data)
+            login_user(user, remember=False)
             return redirect("/")
         return render_template('login.html',
                                message="Incorrect login or password",
                                form=form)
     return render_template('login.html', title='Authorization', form=form)
-
 
 @app.route('/logout')
 @login_required
@@ -138,14 +133,12 @@ def sett():
         user = db_sess.query(User).filter(User.id == current_user.id).first()
         if user:
             form.type.data = user.type
-            form.time.data = user.date
         else:
             abort(404)
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         user = db_sess.query(User).filter(User.id == current_user.id).first()
         if user:
-            user.date = form.time.data
             user.type = form.type.data
             db_sess.commit()
         else:

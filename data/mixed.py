@@ -3,8 +3,8 @@ import sqlalchemy
 from data.db_session import SqlAlchemyBase
 
 
-class Foreign(SqlAlchemyBase):
-    __tablename__ = 'foreign'
+class Mixed(SqlAlchemyBase):
+    __tablename__ = 'mixed'
     id = sqlalchemy.Column(sqlalchemy.Integer,
                            primary_key=True, autoincrement=True, unique=True)
     quote = sqlalchemy.Column(sqlalchemy.String)

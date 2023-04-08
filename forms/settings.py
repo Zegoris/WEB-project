@@ -12,5 +12,6 @@ class SettForm(FlaskForm):
                                ('18:00', '18:00')], validators=[DataRequired()])
     type = RadioField('What type of quotes do you want to receive?',
                       choices=[('rus', 'Russian'),
-                               ('for', 'Foreign')], validators=[DataRequired()])
+                               ('for', 'Foreign'),
+                               ('mix', 'Mixed')], validators=[DataRequired()])
     submit = SubmitField('Submit')

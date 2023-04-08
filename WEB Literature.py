@@ -2,14 +2,17 @@ from forms.user import RegisterForm
 from forms.login import LoginForm
 from forms.settings import SettForm
 from data.timer import RepeatTimer
-from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from flask_login import LoginManager, login_user, login_required,\
+    logout_user, current_user
 from data import db_session
 from data.users import User
 from data.russian import Russian
 from data.foreign import Foreign
-from flask import Flask, render_template, redirect, request, make_response, jsonify, abort
+from data.mixed import Mixed
+from flask import Flask, render_template, redirect, request,\
+    make_response, jsonify, abort
 from time import strftime
-from random import randint, choice
+from random import randint, shuffle
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -29,6 +32,8 @@ def get_quote():
             quote = db_sess.query(Russian).filter(Russian.id == User.current_quote).first()
         elif user.type == 'for':
             quote = db_sess.query(Foreign).filter(Foreign.id == User.current_quote).first()
+        else:
+            quote = db_sess.query(Mixed).filter(Mixed.id == User.current_quote).first()
         if quote:
             return quote
 
@@ -147,6 +152,14 @@ def sett():
             abort(404)
         return redirect('/')
     return render_template('settings.html', title='Settings', form=form)
+
+@app.route('/all')
+@login_required
+def all_quotes():
+    db_sess = db_session.create_session()
+    quotes = list(db_sess.query(Mixed).all())
+    shuffle(quotes)
+    return render_template('all_quotes.html', title='All quotes', quotes=quotes)
 
 
 if __name__ == '__main__':

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+<br><br><br><br><br><br>
+<figure class="text-center">
+  <blockquote class="blockquote">
+    <p>"{{ quote.quote }}"</p>
+  </blockquote>
+  <figcaption class="blockquote-footer">
+    {{ quote.person }}, {{ quote.work }}
+  </figcaption>
+</figure>
+{% endblock %}

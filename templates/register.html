@@ -13,6 +13,14 @@
             </p>
         {% endfor %}
     <p>
+        {{ form.user.label }}<br>
+        {{ form.user(class="form-control") }}<br>
+        {% for error in form.user.errors %}
+            <p class="alert alert-danger" role="alert">
+                {{ error }}
+            </p>
+        {% endfor %}
+    <p>
         {{ form.password.label }}<br>
         {{ form.password(class="form-control", type="password") }}<br>
         {% for error in form.password.errors %}

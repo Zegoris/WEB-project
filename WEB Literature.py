@@ -13,6 +13,7 @@ from flask import Flask, render_template, redirect, request,\
     make_response, jsonify, abort
 from time import strftime
 from random import randint, shuffle
+from sqlalchemy import or_
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -58,7 +59,7 @@ def check():
 
 def main():
     RepeatTimer(1, check).start()
-    app.run(port=8000, host='0.0.0.0')
+    app.run(port=8888, host='0.0.0.0')
 
 
 @app.errorhandler(404)
@@ -87,13 +88,14 @@ def reqister():
             return render_template('register.html', title='Registration',
                                    form=form,
                                    message="The passwords do not match")
-        if db_sess.query(User).filter(User.email == form.email.data).first():
+        if db_sess.query(User).filter(or_(User.email == form.email.data, User.user == form.user.data)).first():
             return render_template('register.html', title='Registration',
                                    form=form,
                                    message="Such a user already exists")
 
         user = User(
             email=form.email.data,
+            user=form.user.data,
             type=form.type.data,
             current_quote=randint(1, 100)
         )

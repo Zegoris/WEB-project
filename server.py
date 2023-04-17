@@ -30,11 +30,11 @@ def get_quote(current):
     user = db_sess.query(User).filter(User.id == current.id).first()
     if user:
         if user.type == 'rus':
-            quote = db_sess.query(Russian).filter(Russian.id == User.current_quote).first()
+            quote = db_sess.query(Russian).filter(Russian.id == user.current_quote).first()
         elif user.type == 'for':
-            quote = db_sess.query(Foreign).filter(Foreign.id == User.current_quote).first()
+            quote = db_sess.query(Foreign).filter(Foreign.id == user.current_quote).first()
         else:
-            quote = db_sess.query(Mixed).filter(Mixed.id == User.current_quote).first()
+            quote = db_sess.query(Mixed).filter(Mixed.id == user.current_quote).first()
         if quote:
             return quote
 

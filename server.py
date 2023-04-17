@@ -59,7 +59,7 @@ def check():
 
 def main():
     RepeatTimer(1, check).start()
-    app.run(port=8888, host='0.0.0.0')
+    app.run(host='0.0.0.0')
 
 
 @app.errorhandler(404)

@@ -34,7 +34,7 @@
 
 URL
 -
-http://web-literator.glitch.me
++ http://web-literator.glitch.me
 
 Разработчики
 -

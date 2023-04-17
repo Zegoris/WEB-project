@@ -34,7 +34,7 @@
 
 URL
 -
-+ http://web-literator.glitch.me
++ https://web-manofletters.glitch.me
 
 Разработчики
 -

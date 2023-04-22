@@ -4,7 +4,7 @@ from forms.settings import SettForm
 from data.timer import RepeatTimer
 from flask_login import LoginManager, login_user, login_required,\
     logout_user, current_user
-from data import db_session
+from data import db_session, quote_api, user_api
 from data.users import User
 from data.russian import Russian
 from data.foreign import Foreign
@@ -12,8 +12,10 @@ from data.mixed import Mixed
 from flask import Flask, render_template, redirect, request,\
     make_response, jsonify, abort
 from time import strftime
-from random import randint, shuffle
+from random import randint
 from sqlalchemy import or_
+from requests import get, post, put
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -27,7 +29,7 @@ db_sess = db_session.create_session()
 
 def get_quote(current):
     db_sess = db_session.create_session()
-    user = db_sess.query(User).filter(User.id == current.id).first()
+    user = db_sess.query(User).filter(User.id == current).first()
     if user:
         if user.type == 'rus':
             quote = db_sess.query(Russian).filter(Russian.id == user.current_quote).first()
@@ -44,7 +46,7 @@ def choice_quote():
     users = db_sess.query(User).all()
     if users:
         for user in users:
-            user.current_quote = randint(1, 100)
+            user.current_quote = randint(1, 75)
             db_sess.commit()
 
 
@@ -59,7 +61,9 @@ def check():
 
 def main():
     RepeatTimer(1, check).start()
-    app.run(host='0.0.0.0', port=8888)
+    app.register_blueprint(quote_api.blueprint)
+    app.register_blueprint(user_api.blueprint)
+    app.run(host='0.0.0.0')
 
 
 @app.errorhandler(404)
@@ -74,7 +78,7 @@ def load_user(user_id):
 @app.route('/')
 def index():
     try:
-        quote = get_quote(current_user)
+        quote = get_quote(current_user.id)
         return render_template('index.html', title='Homepage', quote=quote)
     except AttributeError:
         return redirect('/login')
@@ -93,15 +97,16 @@ def reqister():
                                    form=form,
                                    message="Such a user already exists")
 
-        user = User(
-            email=form.email.data,
-            user=form.user.data,
-            type=form.type.data,
-            current_quote=randint(1, 100)
-        )
-        user.set_password(form.password.data)
-        db_sess.add(user)
-        db_sess.commit()
+        json = post('http://web-manofletter.glitch.me/api/users',
+                    json={'email': form.email.data,
+                          'user': form.user.data,
+                          'type': form.type.data,
+                          'current_quote': randint(1, 75),
+                          'password': form.password.data}).json()
+        db_sess = db_session.create_session()
+        user = db_sess.query(User).filter(User.user == form.user.data).first()
+        if not user:
+            return json
         login_user(user, remember=False)
         return redirect("/")
     return render_template('register.html', title='Registration', form=form)
@@ -138,22 +143,15 @@ def sett():
         else:
             abort(404)
     if form.validate_on_submit():
-        db_sess = db_session.create_session()
-        user = db_sess.query(User).filter(User.id == current_user.id).first()
-        if user:
-            user.type = form.type.data
-            db_sess.commit()
-        else:
-            abort(404)
+        json = put(f'http://web-manofletter.glitch.me/api/users/{current_user.id}',
+                   json={'type': form.type.data}).json()
         return redirect('/')
     return render_template('settings.html', title='Settings', form=form)
 
 @app.route('/quote/')
 @login_required
 def all_quotes():
-    db_sess = db_session.create_session()
-    quotes = list(db_sess.query(Mixed).all())
-    shuffle(quotes)
+    quotes = get('http://web-manofletter.glitch.me/api/quotes').json()
     return render_template('all_quotes.html', title='All quotes', quotes=quotes)
 
 

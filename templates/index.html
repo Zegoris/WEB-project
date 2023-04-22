@@ -1,5 +1,7 @@
-{% extends "base.html" %} {% block content %}
-<br /><br /><br /><br /><br /><br />
+{% extends "base.html" %}
+
+{% block content %}
+<br><br><br><br><br><br>
 <figure class="text-center">
   <blockquote class="blockquote">
     <p>"{{ quote.quote }}"</p>
@@ -8,9 +10,7 @@
     {{ quote.person }}, {{ quote.work }}
   </figcaption>
   <div class="mx-auto">
-    <a type="button" class="btn btn-outline-info" href="/all"
-      >Show all quotes</a
-    >
-  </div>
+  <a type="button" class="btn btn-outline-info" href="/quote/">Show all quotes</a>
+    </div>
 </figure>
 {% endblock %}

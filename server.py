@@ -59,7 +59,7 @@ def check():
 
 def main():
     RepeatTimer(1, check).start()
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', port=8888)
 
 
 @app.errorhandler(404)
@@ -148,7 +148,7 @@ def sett():
         return redirect('/')
     return render_template('settings.html', title='Settings', form=form)
 
-@app.route('/all')
+@app.route('/quote/')
 @login_required
 def all_quotes():
     db_sess = db_session.create_session()

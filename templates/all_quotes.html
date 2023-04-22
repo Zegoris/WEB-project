@@ -1,25 +1,27 @@
-{% extends "base.html" %} {% block content %}
-<table class="table table-hover">
-  <thead>
-    <tr>
-      <th scope="col">№</th>
-      <th scope="col">Quote</th>
-      <th scope="col">Person</th>
-      <th scope="col">Work</th>
-    </tr>
-  </thead>
+{% extends "base.html" %}
 
-  <tbody>
+{% block content %}
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th scope="col">№</th>
+        <th scope="col">Quote</th>
+        <th scope="col">Person</th>
+        <th scope="col">Work</th>
+      </tr>
+    </thead>
+
+    <tbody>
     {% for item in quotes %}
-    <tr>
-      <td>{{loop.index}}</td>
-      <td>{{item.quote}}</td>
-      <td>{{item.person}}</td>
-      <td>{{item.work}}</td>
-    </tr>
+      <tr>
+        <td scope="row">{{loop.index}}</td>
+        <td>{{item.quote}}</td>
+          <td>{{item.person}}</td>
+          <td>{{item.work}}</td>
+      </tr>
     {% endfor %}
-  </tbody>
-</table>
-<br />
+    </tbody>
+  </table>
+<br>
 
 {% endblock %}
